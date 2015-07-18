@@ -3,6 +3,7 @@ private:
 	unsigned short source_port;
 	unsigned short dest_port;
 	unsigned short checksum;
+	virtual unsigned char*  buildHeader();
 public:
 	
 	unsigned short getSourcePort(){
@@ -11,8 +12,21 @@ public:
 	unsigned short getDestPort(){
 		return dest_port;
 	}
-	unsigned short getChecksum();
+	unsigned short getChecksum(){
+		return checksum;
+	}
+	void setSourcePort(unsigned short sp){
+		this->source_port = sp;
+	}
+	void setDestPort(unsigned short dp){
+		this->dest_port = dp;
+	}
+	unsigned char* getRawHeader(){
+		return buildHeader();
+	}
 	virtual void calcChecksum();
-	virtual void buildHeader();
+	
+
+	
 
 };

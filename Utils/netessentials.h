@@ -10,6 +10,10 @@ typedef unsigned char UCHAR;
 typedef unsigned long       DWORD;
 typedef unsigned char       BYTE;
 typedef unsigned short      WORD;
+typedef __int16 uint16_t;
+typedef __int32 uint32_t;
+typedef __int8  uint8_t;
+
 
 
 /*
@@ -160,55 +164,7 @@ typedef struct icmp_hdr
 Functions
 */
 
-void dump_arp(ARP_HDR* arp_hdr)
-{
-	uint16_t htype = ntohs(arp_hdr->hardware_type);
-	uint16_t ptype = ntohs(arp_hdr->protocol_type);
-	uint16_t oper = ntohs(arp_hdr->operation_code);
-	switch (htype)
-	{
-	case 0x0001:
-		printf("ARP HTYPE: Ethernet(0x%04X)\n", htype);
-		break;
-	default:
-		printf("ARP HYPE: 0x%04X\n", htype);
-		break;
-	}
-	switch (ptype)
-	{
-	case 0x0800:
-		printf("ARP PTYPE: IPv4(0x%04X)\n", ptype);
-		break;
-	default:
-		printf("ARP PTYPE: 0x%04X\n", ptype);
-		break;
-	}
-	printf("ARP HLEN: %d\n", arp_hdr->hardware_len);
-	printf("ARP PLEN: %d\n", arp_hdr->protocol_len);
-	switch (oper)
-	{
-	case 0x0001:
-		printf("ARP OPER: Request(0x%04X)\n", oper);
-		break;
-	case 0x0002:
-		printf("ARP OPER: Response(0x%04X)\n", oper);
-		break;
-	default:
-		printf("ARP OPER: 0x%04X\n", oper);
-		break;
-	}
-	printf("ARP Sender HA: %02X:%02X:%02X:%02X:%02X:%02X\n",
-		arp_hdr->sender_hwaddress[0], arp_hdr->sender_hwaddress[1], arp_hdr->sender_hwaddress[2],
-		arp_hdr->sender_hwaddress[3], arp_hdr->sender_hwaddress[4], arp_hdr->sender_hwaddress[5]);
-	printf("ARP Sender PA: %d.%d.%d.%d\n", arp_hdr->sender_ipaddress[0],
-		arp_hdr->sender_ipaddress[1], arp_hdr->sender_ipaddress[2], arp_hdr->sender_ipaddress[3]);
-	printf("ARP Target HA: %02X:%02X:%02X:%02X:%02X:%02X\n",
-		arp_hdr->target_hwaddress[0], arp_hdr->target_hwaddress[1], arp_hdr->target_hwaddress[2],
-		arp_hdr->target_hwaddress[3], arp_hdr->target_hwaddress[4], arp_hdr->target_hwaddress[5]);
-	printf("ARP Target PA: %d.%d.%d.%d\n", arp_hdr->target_ipaddress[0],
-		arp_hdr->target_ipaddress[1], arp_hdr->target_ipaddress[2], arp_hdr->target_ipaddress[3]);
-	printf("ARP DONE =====================\n");
-}
+
 char* getMacFomated(unsigned char* mac)
 {
 	char* dest = new char[20];
@@ -216,74 +172,5 @@ char* getMacFomated(unsigned char* mac)
 			mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 		return dest;
 }
-void PrintData (char* data ,int start, int Size)
-{
-    char a , line[17] , c;
-    int j;
 
-    //loop over each character and print
-    for(int i=start ; i < Size ; i++)
-    {
-        c = data[i];
 
-        //Print the hex value for every character , with a space. Important to make unsigned
-        printf(" %.2x", (unsigned char) c);
-
-        //Add the character to data line. Important to make unsigned
-        a = ( c >=32 && c <=128) ? (unsigned char) c : '.';
-
-        line[i%16] = a;
-
-        //if last character of a line , then print the line - 16 characters in 1 line
-        if( (i!=0 && (i+1)%16==0) || i == Size - 1)
-        {
-            line[i%16 + 1] = '\0';
-
-            //print a big gap of 10 characters between hex and characters
-            printf("          ");
-
-            //Print additional spaces for last lines which might be less than 16 characters in length
-            for( j = strlen(line) ; j < 16; j++)
-            {
-                printf( "   ");
-            }
-
-            printf( "%s \n" , line);
-        }
-    }
-
-    printf( "\n");
-}
-
-void printIpHeader(IPV4_HDR * iphdr)
-{
-	unsigned short iphdrlen;
-	struct sockaddr_in source, dest;
-	iphdrlen = iphdr->ip_header_len * 4;
-
-	memset(&source, 0, sizeof(source));
-	source.sin_addr.s_addr = iphdr->ip_srcaddr;
-
-	memset(&dest, 0, sizeof(dest));
-	dest.sin_addr.s_addr = iphdr->ip_destaddr;
-
-	printf("\n");
-	printf("IP Header\n");
-	printf(" |-IP Version : %d\n", (unsigned int)iphdr->ip_version);
-	printf(" |-IP Header Length : %d DWORDS or %d Bytes\n", (unsigned int)iphdr->ip_header_len, ((unsigned int)(iphdrlen)));
-	printf(" |-Type Of Service : %d\n", (unsigned int)iphdr->ip_tos);
-	printf(" |-IP Total Length : %d Bytes(Size of Packet)\n", ntohs(iphdr->ip_total_length));
-	printf(" |-Identification : %d\n", ntohs(iphdr->ip_id));
-	printf(" |-Reserved ZERO Field : %d\n", (unsigned int)iphdr->ip_reserved_zero);
-	printf(" |-Dont Fragment Field : %d\n", (unsigned int)iphdr->ip_dont_fragment);
-	printf(" |-More Fragment Field : %d\n", (unsigned int)iphdr->ip_more_fragment);
-	printf(" |-TTL : %d\n", (unsigned int)iphdr->ip_ttl);
-	printf(" |-Protocol : %d\n", (unsigned int)iphdr->ip_protocol);
-	printf(" |-Checksum : %d\n", ntohs(iphdr->ip_checksum));
-	printf(" |-Source IP : %s\n", inet_ntoa(source.sin_addr));
-	printf(" |-Destination IP : %s\n", inet_ntoa(dest.sin_addr));
-}
-
-void printIpv6Header(IPV6_HDR hdr){
-	
-}

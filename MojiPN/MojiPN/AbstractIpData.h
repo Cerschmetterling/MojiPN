@@ -1,11 +1,17 @@
 class AbstractIpData{
 private:
 	unsigned int version;
+
+	virtual unsigned char* buildHeader();
 public:	
-	virtual void buildHeader();
+	
 	unsigned int getVersion(){
-		return version;
+		return this->version;
 	}
-
-
+	void setVersion(unsigned int v){
+		this->version = v;
+	}
+	virtual unsigned char* getRawHeader(){
+		return buildHeader();
+	}
 };
